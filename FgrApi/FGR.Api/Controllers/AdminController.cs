@@ -27,5 +27,9 @@ namespace FGR.Api.Controllers
         public async Task<ActionResult<IWrapper<UserActionsExecutor.Reply?>>> GetCompanyUser(string company, long id, [FromServices] UserActionsExecutor srv) =>
             await ActionWithParameterAsync<(string company, long id), UserActionsExecutor, UserActionsExecutor.Reply>((company, id), srv);
 
+
+        [HttpPost("users/add")]
+        public async Task<ActionResult<IWrapper<UserActionsExecutor.Reply?>>> AddUser([FromBody] UserActionsExecutor.Request user, [FromServices] UserActionsExecutor srv) => 
+            await ActionAsync<UserActionsExecutor.Request, UserActionsExecutor, UserActionsExecutor.Reply>(srv, user);
     }
 }

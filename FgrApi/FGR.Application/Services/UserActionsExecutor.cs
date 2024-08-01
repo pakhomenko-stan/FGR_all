@@ -6,9 +6,8 @@ namespace FGR.Application.Services
     {
         public class Request
         {
-            public string Id { get; set; } = null!;
+            public long Id { get; set; }
             public string Name { get; set; } = null!;
-            public string Description { get; set; } = null!;
         }
 
         public class Reply
@@ -27,11 +26,17 @@ namespace FGR.Application.Services
         
         private async Task<Reply?> ExecuteGenericAsync<TPar>(TPar? param, Request? input)
         {
+            await Task.CompletedTask;
+
             if (param is not null && param.GetType() != typeof(int) && param.GetType() != typeof(string)) throw new Exception("Wrong type of parameter ))");
 
-            await Task.CompletedTask;
-            var result = new Reply { Name = $"random name {param?.ToString() ?? string.Empty}" };
+            var result = input is null
+                    ? new Reply { Name = $"it is get request {param?.ToString() ?? string.Empty}" }
+                    : new Reply { Name = $"it is POST request {input?.Name ?? string.Empty}" };
+
             return result;
+
+
         }
 
     }

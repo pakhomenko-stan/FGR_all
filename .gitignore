@@ -1,0 +1,16 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/FgrApi/.vs
+/FgrApi/CommonInterfaces/bin/Debug/net8.0
+/FgrApi/CommonInterfaces/obj
+/FgrApi/FGR.Api/.config
+/FgrApi/FGR.Api/bin/Debug/net8.0
+/FgrApi/FGR.Api/obj
+/FgrApi/FGR.Application/bin/Debug/net8.0
+/FgrApi/FGR.Application/obj
+/FgrApi/FGR.Common/bin/Debug/net8.0
+/FgrApi/FGR.Common/obj
+/FgrApi/FGR.Domain/bin/Debug/net8.0
+/FgrApi/FGR.Domain/obj

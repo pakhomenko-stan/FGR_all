@@ -13,6 +13,7 @@
   <ItemGroup>
     <ProjectReference Include="..\CommonInterfaces\CommonInterfaces.csproj" />
     <ProjectReference Include="..\FGR.Common\FGR.Common.csproj" />
+    <ProjectReference Include="..\FGR.Domain\FGR.Domain.csproj" />
   </ItemGroup>
 
 </Project>

@@ -3,17 +3,19 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.10.35013.160
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FGR.Api", "FGR.Api\FGR.Api.csproj", "{BBE838ED-0A99-4146-B820-83C838A045AD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FGR.Api", "FGR.Api\FGR.Api.csproj", "{BBE838ED-0A99-4146-B820-83C838A045AD}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{8378A1CE-8537-4736-959A-8B5B90426E8D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FGR.Common", "FGR.Common\FGR.Common.csproj", "{D34173C5-F7CC-4AEF-9E7A-F8B78AA34630}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FGR.Common", "FGR.Common\FGR.Common.csproj", "{D34173C5-F7CC-4AEF-9E7A-F8B78AA34630}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FGR.Domain", "FGR.Domain\FGR.Domain.csproj", "{DADFEF60-3321-4ED1-8748-9DD381D42318}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FGR.Domain", "FGR.Domain\FGR.Domain.csproj", "{DADFEF60-3321-4ED1-8748-9DD381D42318}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FGR.Application", "FGR.Application\FGR.Application.csproj", "{EC8EF795-B319-4222-ADBC-D5146E2BFDB0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FGR.Application", "FGR.Application\FGR.Application.csproj", "{EC8EF795-B319-4222-ADBC-D5146E2BFDB0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommonInterfaces", "CommonInterfaces\CommonInterfaces.csproj", "{485D0FCA-A6B9-4A5A-BDF3-1B6BFFE4C957}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommonInterfaces", "CommonInterfaces\CommonInterfaces.csproj", "{485D0FCA-A6B9-4A5A-BDF3-1B6BFFE4C957}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FGR.Infrastructure", "FGR.Infrastructure\FGR.Infrastructure.csproj", "{6A08ADF9-4332-41FC-8F14-D77F29F59CB9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,6 +43,10 @@ Global
 		{485D0FCA-A6B9-4A5A-BDF3-1B6BFFE4C957}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{485D0FCA-A6B9-4A5A-BDF3-1B6BFFE4C957}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{485D0FCA-A6B9-4A5A-BDF3-1B6BFFE4C957}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6A08ADF9-4332-41FC-8F14-D77F29F59CB9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6A08ADF9-4332-41FC-8F14-D77F29F59CB9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6A08ADF9-4332-41FC-8F14-D77F29F59CB9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6A08ADF9-4332-41FC-8F14-D77F29F59CB9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

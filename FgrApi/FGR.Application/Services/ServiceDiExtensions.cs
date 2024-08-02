@@ -4,9 +4,9 @@ namespace FGR.Application.Services
 {
     public static class ServiceDiExtensions
     {
-        public static void AddFgrApplicationServices(this IServiceCollection serviceCollection)
+        public static void AddFgrApplicationServices(this IServiceCollection services)
         {
-            serviceCollection.AddScoped<UserActionsExecutor>();
+            services.AddScoped<UserActionsExecutor>();
         }
     }
 }

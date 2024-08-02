@@ -1,4 +1,6 @@
-﻿using FGR.Domain.Factories;
+﻿using System.Reflection;
+using FGR.Common.Attributes;
+using FGR.Common.Implementation;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace FGR.Application.Factories
@@ -7,7 +9,7 @@ namespace FGR.Application.Factories
     {
         public static void AddFgrFactories(this IServiceCollection services)
         {
-            services.AddScoped(typeof(IWrapperFactory<>), typeof(WrapperFactory<>));
+            services.AddImplementable(Assembly.GetExecutingAssembly(), ImplementableType.Factory);
         }
     }
 }

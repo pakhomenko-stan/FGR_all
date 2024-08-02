@@ -21,6 +21,7 @@
     <ProjectReference Include="..\FGR.Application\FGR.Application.csproj" />
     <ProjectReference Include="..\FGR.Common\FGR.Common.csproj" />
     <ProjectReference Include="..\FGR.Domain\FGR.Domain.csproj" />
+    <ProjectReference Include="..\FGR.Infrastructure\FGR.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

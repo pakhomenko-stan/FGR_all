@@ -1,8 +1,9 @@
+using FGR.Application.Factories;
+using FGR.Application.Services;
+using FGR.Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Identity.Web;
-using FGR.Application.Services;
-using FGR.Application.Factories;
 
 namespace FGR.Api
 {
@@ -20,8 +21,11 @@ namespace FGR.Api
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
+
+
             builder.Services.AddFgrApplicationServices();
             builder.Services.AddFgrFactories();
+            builder.Services.AddFrgRepositories();
 
             builder.Services.AddControllers();
             builder.Services.Configure<ForwardedHeadersOptions>(options =>

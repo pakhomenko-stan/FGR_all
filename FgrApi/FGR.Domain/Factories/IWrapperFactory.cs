@@ -2,9 +2,9 @@
 
 namespace FGR.Domain.Factories
 {
-    public interface IWrapperFactory<T>
+    public interface IWrapperFactory
     {
-        IWrapper<T?> Create(T? entity);
-        IWrapper<T?> Create(string message);
+        IWrapper<T?> Create<T>(T? entity);
+        IWrapper<T?> Create<T>(string message);
     }
 }

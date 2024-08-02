@@ -3,15 +3,15 @@ using CommonInterfaces.Services;
 using FGR.Domain.Factories;
 using Microsoft.AspNetCore.Mvc;
 
-namespace FGR.Common
+namespace FGR.Api.Controllers
 {
-    public class BaseFgrController: ControllerBase
+    public class BaseFgrController : ControllerBase
     {
         protected async Task<IWrapper<TOut?>> ExecutorWrapper<TOut>(Func<Task<TOut?>> function)
         {
             var scope = ControllerContext.HttpContext.RequestServices.CreateScope();
             var sp = scope.ServiceProvider;
-            IWrapperFactory<TOut> factory = sp.GetRequiredService(typeof(IWrapperFactory<>).MakeGenericType(typeof(TOut))) as IWrapperFactory<TOut> ?? throw new Exception(); //TODO - specify exception
+            IWrapperFactory factory = sp.GetRequiredService<IWrapperFactory>() ?? throw new Exception(); //TODO - specify exception
             try
             {
                 var data = await function.Invoke();
@@ -20,7 +20,7 @@ namespace FGR.Common
             }
             catch (Exception e)
             {
-                IWrapper<TOut?> reply = factory.Create(e.Message);
+                IWrapper<TOut?> reply = factory.Create<TOut>(e.Message);
                 return reply;
 
             }

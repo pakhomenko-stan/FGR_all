@@ -1,5 +1,4 @@
-﻿using FGR.Common;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using CommonInterfaces.DTO;
 using FGR.Application.Services;
 

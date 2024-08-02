@@ -1,11 +1,13 @@
 ﻿using CommonInterfaces.DTO;
+using FGR.Common.Attributes;
 using FGR.Domain.Factories;
 
 namespace FGR.Application.Factories
 {
-    public class WrapperFactory<T> : IWrapperFactory<T> where T : class 
+    [Implementable(ImplementableType.Factory)]
+    public class WrapperFactory : IWrapperFactory
     {
-        private class Wrapper : IWrapper<T?>
+        private class Wrapper<T> : IWrapper<T>
         {
             public T? Data { get; set; }
             public string? Title { get; set; }
@@ -13,9 +15,9 @@ namespace FGR.Application.Factories
             public string Message { get; set; } = null!;
         }
 
-        public IWrapper<T?> Create(T? entity)
+        public IWrapper<T?> Create<T>(T? entity)
         {
-            var result = new Wrapper
+            var result = new Wrapper<T?>
             {
                 Data = entity,
                 Title = "Wrapper",
@@ -25,11 +27,11 @@ namespace FGR.Application.Factories
             return result;
         }
 
-        public IWrapper<T?> Create(string message)
+        public IWrapper<T?> Create<T>(string message)
         {
-            var result = new Wrapper
+            var result = new Wrapper<T?>
             {
-                Data = null,
+                Data = default,
                 Title = "Wrapper",
                 Status = DataTransferStatus.Failure,
                 Message = message,

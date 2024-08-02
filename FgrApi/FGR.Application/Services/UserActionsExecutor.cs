@@ -2,7 +2,7 @@
 
 namespace FGR.Application.Services
 {
-    public class UserActionsExecutor : AbstractExecutor<UserActionsExecutor.Request, UserActionsExecutor.Reply>
+    public class UserActionsExecutor(IServiceProvider serviceProvider) : AbstractExecutor<UserActionsExecutor.Request, UserActionsExecutor.Reply>(serviceProvider)
     {
         public class Request
         {

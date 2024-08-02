@@ -9,9 +9,7 @@ namespace FGR.Api.Controllers
     {
         protected async Task<IWrapper<TOut?>> ExecutorWrapper<TOut>(Func<Task<TOut?>> function)
         {
-            var scope = ControllerContext.HttpContext.RequestServices.CreateScope();
-            var sp = scope.ServiceProvider;
-            IWrapperFactory factory = sp.GetRequiredService<IWrapperFactory>() ?? throw new Exception(); //TODO - specify exception
+            IWrapperFactory factory = ControllerContext.HttpContext.RequestServices.GetRequiredService<IWrapperFactory>() ?? throw new Exception(); //TODO - specify exception
             try
             {
                 var data = await function.Invoke();

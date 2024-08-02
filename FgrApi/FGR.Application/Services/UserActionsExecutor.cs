@@ -23,12 +23,12 @@ namespace FGR.Application.Services
             await Task.CompletedTask;
             var user = input?.GetUser();
 
-            await Repository<IUser>().Transaction(async (rep, action) =>
+            await Repository<IUser>().Transaction(async (rep, savePointAction) =>
             {
                 if (user == null) throw new ArgumentNullException(nameof(input));
                 var usr = await rep.AddEntityAsync(user, token);
                 var sp1 = await rep.SaveAsync(token);
-                action?.Invoke(sp1);
+                savePointAction?.Invoke(sp1);
                 if ((usr?.Id ?? 0) < 1000) throw new Exception("Wrong Id of user");
             });
 

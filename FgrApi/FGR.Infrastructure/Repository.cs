@@ -155,14 +155,22 @@ namespace FGR.Infrastructure
         public async Task Transaction(Func<IRepository<IEntity>, Action<string>?, Task> func)
         {
             using var transaction = _context.Database.BeginTransaction();
+            string savePoint = string.Empty;
             try
             {
-                await func(this, null);
+                await func(this, sp => { transaction.CreateSavepoint(sp); savePoint = sp; });
                 transaction.Commit();
             }
             catch (Exception)
             {
-                transaction.Rollback();
+                if (string.IsNullOrEmpty(savePoint))
+                {
+                    transaction.RollbackToSavepoint(savePoint);
+                }
+                else
+                {
+                    transaction.Rollback();
+                }
                 throw;
             }
             finally

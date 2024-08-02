@@ -14,3 +14,5 @@
 /FgrApi/FGR.Common/obj
 /FgrApi/FGR.Domain/bin/Debug/net8.0
 /FgrApi/FGR.Domain/obj
+/FgrApi/FGR.Infrastructure/bin/Debug/net8.0
+/FgrApi/FGR.Infrastructure/obj

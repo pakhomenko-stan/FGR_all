@@ -23,36 +23,36 @@ namespace FGR.Api.Controllers
 
             }
         }
-        protected async Task<ActionResult<IWrapper<TOut?>>> ActionAsync<TSrv, TOut>(TSrv action)
+        protected async Task<ActionResult<IWrapper<TOut?>>> ActionAsync<TSrv, TOut>(TSrv action, CancellationToken token)
             where TOut : class
             where TSrv : class, IExecutor<TOut>
         {
-            var result = await ExecutorWrapper(async () => await action.ExecuteAsync());
+            var result = await ExecutorWrapper(async () => await action.ExecuteAsync(token));
             return Ok(result);
         }
-        protected async Task<ActionResult<IWrapper<TOut?>>> ActionWithParameterAsync<TPar, TSrv, TOut>(TPar param, TSrv action)
+        protected async Task<ActionResult<IWrapper<TOut?>>> ActionWithParameterAsync<TPar, TSrv, TOut>(TPar param, TSrv action, CancellationToken token)
             where TOut : class
             where TSrv : class, IExecutor<TOut>
         {
-            var result = await ExecutorWrapper(async () => await action.ExecuteAsync(param));
+            var result = await ExecutorWrapper(async () => await action.ExecuteAsync(param, token));
             return Ok(result);
         }
 
-        protected async Task<ActionResult<IWrapper<TOut?>>> ActionAsync<TIn, TSrv, TOut>(TSrv action, TIn request)
+        protected async Task<ActionResult<IWrapper<TOut?>>> ActionAsync<TIn, TSrv, TOut>(TSrv action, TIn request, CancellationToken token)
             where TOut : class
             where TIn : class
             where TSrv : class, IExecutor<TIn, TOut>
         {
-            var result = await ExecutorWrapper(async () => await action.ExecuteAsync(request));
+            var result = await ExecutorWrapper(async () => await action.ExecuteAsync(request, token));
             return Ok(result);
         }
 
-        protected async Task<ActionResult<IWrapper<TOut>>> ActionWithParameterAsync<TPar, TIn, TSrv, TOut>(TPar param, TSrv action, TIn? request = default)
+        protected async Task<ActionResult<IWrapper<TOut>>> ActionWithParameterAsync<TPar, TIn, TSrv, TOut>(TPar param, TSrv action, TIn? request, CancellationToken token)
             where TOut : class
             where TIn : class
             where TSrv : class, IExecutor<TIn, TOut>
         {
-            var result = await ExecutorWrapper(async () => await action.ExecuteAsync(param, request));
+            var result = await ExecutorWrapper(async () => await action.ExecuteAsync(param, request, token));
             return Ok(result);
         }
 

@@ -10,10 +10,7 @@
     <ProjectReference Include="..\CommonInterfaces\CommonInterfaces.csproj" />
     <ProjectReference Include="..\FGR.Common\FGR.Common.csproj" />
     <ProjectReference Include="..\FGR.Domain\FGR.Domain.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.0-rc.2.23479.6" />
+    <ProjectReference Include="..\FGR.Infrastructure\FGR.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

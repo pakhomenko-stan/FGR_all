@@ -1,10 +1,10 @@
 ﻿using System.Linq.Expressions;
-using Microsoft.EntityFrameworkCore;
 using FGR.Common.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace FGR.Infrastructure
 {
-    public class Repository<IEntity, T, TContext>(TContext context) : IRepository<IEntity>
+    public class Repository<IEntity, T, TContext>(TContext context) : IRepository<IEntity>, IDisposable
         where T : class, IEntity, new()
         where IEntity : class
         where TContext : DbContext
@@ -13,9 +13,9 @@ namespace FGR.Infrastructure
 
         public void Dispose()
         {
+            GC.SuppressFinalize(this);
             _context?.Dispose();
         }
-
 
         public IEntity AddEntity(IEntity entity)
         {
@@ -75,10 +75,10 @@ namespace FGR.Infrastructure
             string includeExpression = "",
             Expression<Func<IEntity, object>>? orderExpression = null,
             bool sortAscending = true,
+            bool noTracking = false,
             bool includeDeleted = false)
         {
-            var query = GetEntitiesQuery(whereExpression, includeExpression, orderExpression, sortAscending, includeDeleted);
-
+            var query = GetEntitiesQuery(whereExpression, includeExpression, orderExpression, sortAscending, noTracking, includeDeleted);
             List<IEntity> result = [.. query];
 
             return result;
@@ -152,14 +152,61 @@ namespace FGR.Infrastructure
             return _context.Set<T>().FromSqlRaw(sql, parameters);
         }
 
-        public async Task<IEntity?> GetByIDAsync(long id)
+        public async Task Transaction(Func<IRepository<IEntity>, Action<string>?, Task> func)
         {
-            return await _context.Set<T>().FindAsync(id);
+            using var transaction = _context.Database.BeginTransaction();
+            try
+            {
+                await func(this, null);
+                transaction.Commit();
+            }
+            catch (Exception)
+            {
+                transaction.Rollback();
+                throw;
+            }
+            finally
+            {
+                transaction.Dispose();
+            }
         }
 
-        public async Task SaveAsync()
+
+        public async Task<IEntity?> GetByIDAsync(long id, CancellationToken token)
         {
-            await _context.SaveChangesAsync();
+            return await _context.Set<T>().FindAsync([id], cancellationToken: token);
+        }
+
+        public async Task<string> SaveAsync(CancellationToken token)
+        {
+            await _context.SaveChangesAsync(token);
+            var savePoint = $"savePoint_{Guid.NewGuid()}";
+            return savePoint;
+        }
+
+        public async Task<IEntity?> AddEntityAsync(IEntity entity, CancellationToken token)
+        {
+            var entityTrack = await _context.Set<T>().AddAsync((T)entity, token);
+            return entityTrack.Entity;
+        }
+
+        public async Task<ICollection<IEntity>?> AddEntitiesAsync(ICollection<IEntity> collection, CancellationToken token)
+        {
+            await _context.Set<T>().AddRangeAsync(collection.Select(e => (T)e), token);
+            return collection;
+        }
+
+        public async Task<ICollection<IEntity>?> GetEntitiesAsync(Expression<Func<IEntity, bool>>? whereExpression = null,
+            string includeExpression = "",
+            Expression<Func<IEntity, object>>? orderExpression = null,
+            bool sortAscending = true,
+            bool noTracking = false,
+            bool includeDeleted = false,
+            CancellationToken token = default)
+        {
+            var query = GetEntitiesQuery(whereExpression, includeExpression, orderExpression, sortAscending, noTracking, includeDeleted);
+            List<IEntity> result = await query.ToListAsync(token);
+            return result;
         }
     }
 }

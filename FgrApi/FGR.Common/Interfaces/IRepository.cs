@@ -10,12 +10,13 @@ namespace FGR.Common.Interfaces
         where IEntity : class
     {
         void Dispose();
+
+
         IEntity AddEntity(IEntity entity);
         ICollection<IEntity> AddEntities(ICollection<IEntity> collection);
         void DeleteEntity(IEntity entity);
         void DeleteEntities(ICollection<IEntity> collection);
         IEntity? GetByID(long id);
-        Task<IEntity?> GetByIDAsync(long id);
         List<IEntity> GetEntities();
         List<IEntity> GetEntities(Expression<Func<IEntity, object>>? orderExpression);
         List<IEntity> GetEntities(Expression<Func<IEntity, bool>>? whereExpression);
@@ -26,6 +27,7 @@ namespace FGR.Common.Interfaces
             string includeExpression = "",
             Expression<Func<IEntity, object>>? orderExpression = null,
             bool sortAscending = true,
+            bool noTracking = false,
             bool includeDeleted = false);
         IQueryable<IEntity> GetEntitiesQuery(
               Expression<Func<IEntity, bool>>? whereExpression = null,
@@ -37,11 +39,26 @@ namespace FGR.Common.Interfaces
 
         int ExecuteWithStoreProcedure(string query, params object[] parameters);
         void Save();
-        Task SaveAsync();
         void Reload<T1>(T1 entity) where T1 : class;
         List<IEntity> GetEntitiesNoTracking();
         List<IEntity> GetEntitiesNoTracking(Expression<Func<IEntity, bool>>? whereExpression);
         IEntity Update(IEntity entity);
         IEnumerable<IEntity> ExecuteQuery(string sql, params object[] parameters);
+
+        Task Transaction(Func<IRepository<IEntity>, Action<string>?, Task> func);
+
+        Task<IEntity?> GetByIDAsync(long id, CancellationToken token);
+        Task<IEntity?> AddEntityAsync(IEntity entity, CancellationToken token);
+        Task<ICollection<IEntity>?> AddEntitiesAsync(ICollection<IEntity> collection, CancellationToken token);
+        Task<ICollection<IEntity>?> GetEntitiesAsync(
+            Expression<Func<IEntity, bool>>? whereExpression = null,
+            string includeExpression = "",
+            Expression<Func<IEntity, object>>? orderExpression = null,
+            bool sortAscending = true,
+            bool noTracking = false,
+            bool includeDeleted = false, 
+            CancellationToken token = default);
+
+        Task<string> SaveAsync(CancellationToken token);
     }
 }

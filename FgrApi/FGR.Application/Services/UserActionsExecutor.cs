@@ -1,4 +1,6 @@
 ﻿using FGR.Application.Services.Abstract;
+using FGR.Domain.Interfaces;
+using FGR.Infrastructure.Models;
 
 namespace FGR.Application.Services
 {
@@ -16,9 +18,19 @@ namespace FGR.Application.Services
 
         }
 
-        protected override async Task<Reply?> ExecuteGenericAsync<TPar>(TPar? param, Request? input) where TPar : default
+        protected override async Task<Reply?> ExecuteGenericAsync<TPar>(TPar? param, Request? input, CancellationToken token) where TPar : default
         {
             await Task.CompletedTask;
+            var user = input?.GetUser();
+
+            await Repository<IUser>().Transaction(async (rep, action) =>
+            {
+                if (user == null) throw new ArgumentNullException(nameof(input));
+                var usr = await rep.AddEntityAsync(user, token);
+                var sp1 = await rep.SaveAsync(token);
+                action?.Invoke(sp1);
+                if ((usr?.Id ?? 0) < 1000) throw new Exception("Wrong Id of user");
+            });
 
             if (param is not null && param.GetType() != typeof(int) && param.GetType() != typeof(string)) throw new Exception("Wrong type of parameter ))");
 
@@ -29,5 +41,10 @@ namespace FGR.Application.Services
             return result;
         }
 
+    }
+
+    static class UserExtensions
+    {
+        public static IUser GetUser(this UserActionsExecutor.Request request) => new User { Id = request.Id, Name = request.Name }; 
     }
 }

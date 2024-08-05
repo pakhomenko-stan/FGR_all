@@ -4,6 +4,8 @@ using CommonInterfaces.Options;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using FGR.Infrastructure.Services;
+using FGR.Common.Interfaces;
 
 namespace FGR.Infrastructure
 {
@@ -41,7 +43,6 @@ namespace FGR.Infrastructure
                 return repositoryType;
             }
 
-            services.AddScoped(s => ActivatorUtilities.CreateInstance(s, typeof(TContext)));
             var sp = services.BuildServiceProvider();
             var context = sp.GetRequiredService<TContext>();
             var contextTypes = context.GetType().GetProperties().Select(p => p.PropertyType);
@@ -52,6 +53,8 @@ namespace FGR.Infrastructure
                 .Select(g => (assembly: g.Key, interfaces: g.SelectMany(e => e.GetInterfaces())));
 
             byAssemblies.ForEach(item => action(services, item.interfaces, item.assembly, implementation));
+
+            services.AddScoped<IRepHolder, RepHolder<TContext>>();
 
             return services;
         }

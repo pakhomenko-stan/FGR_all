@@ -1,10 +1,11 @@
 ﻿using FGR.Application.Services.Abstract;
+using FGR.Common.Interfaces;
 using FGR.Domain.Interfaces;
 using FGR.Infrastructure.Models;
 
 namespace FGR.Application.Services
 {
-    public class UserActionsExecutor(IServiceProvider serviceProvider) : AbstractExecutor<UserActionsExecutor.Request, UserActionsExecutor.Reply>(serviceProvider)
+    public class UserActionsExecutor(IRepHolder repHolder) : AbstractExecutor<UserActionsExecutor.Request, UserActionsExecutor.Reply>(repHolder)
     {
         public class Request
         {
@@ -23,12 +24,12 @@ namespace FGR.Application.Services
             await Task.CompletedTask;
             var user = input?.GetUser();
 
-            await Repository<IUser>().Transaction(async (rep, savePointAction) =>
+            await RepHolder.Transaction(async (rep, savePointAction) =>
             {
                 if (user == null) throw new ArgumentNullException(nameof(input));
-                var usr = await rep.AddEntityAsync(user, token);
+                var usr = await rep.Repository<IUser>().AddEntityAsync(user, token);
                 var sp1 = await rep.SaveAsync(token);
-                savePointAction?.Invoke(sp1);
+                savePointAction(sp1);
                 if ((usr?.Id ?? 0) < 1000) throw new Exception("Wrong Id of user");
             });
 
@@ -45,6 +46,6 @@ namespace FGR.Application.Services
 
     static class UserExtensions
     {
-        public static IUser GetUser(this UserActionsExecutor.Request request) => new User { Id = request.Id, Name = request.Name }; 
+        public static IUser GetUser(this UserActionsExecutor.Request request) => new User { Id = request.Id, Name = request.Name };
     }
 }

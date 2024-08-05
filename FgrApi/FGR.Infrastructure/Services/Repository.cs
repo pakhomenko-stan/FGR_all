@@ -2,7 +2,7 @@
 using FGR.Common.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
-namespace FGR.Infrastructure
+namespace FGR.Infrastructure.Services
 {
     public class Repository<IEntity, T, TContext>(TContext context) : IRepository<IEntity>, IDisposable
         where T : class, IEntity, new()
@@ -151,34 +151,6 @@ namespace FGR.Infrastructure
         {
             return _context.Set<T>().FromSqlRaw(sql, parameters);
         }
-
-        public async Task Transaction(Func<IRepository<IEntity>, Action<string>?, Task> func)
-        {
-            using var transaction = _context.Database.BeginTransaction();
-            string savePoint = string.Empty;
-            try
-            {
-                await func(this, sp => { transaction.CreateSavepoint(sp); savePoint = sp; });
-                transaction.Commit();
-            }
-            catch (Exception)
-            {
-                if (string.IsNullOrEmpty(savePoint))
-                {
-                    transaction.RollbackToSavepoint(savePoint);
-                }
-                else
-                {
-                    transaction.Rollback();
-                }
-                throw;
-            }
-            finally
-            {
-                transaction.Dispose();
-            }
-        }
-
 
         public async Task<IEntity?> GetByIDAsync(long id, CancellationToken token)
         {

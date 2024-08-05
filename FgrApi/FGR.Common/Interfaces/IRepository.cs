@@ -45,8 +45,6 @@ namespace FGR.Common.Interfaces
         IEntity Update(IEntity entity);
         IEnumerable<IEntity> ExecuteQuery(string sql, params object[] parameters);
 
-        Task Transaction(Func<IRepository<IEntity>, Action<string>?, Task> func);
-
         Task<IEntity?> GetByIDAsync(long id, CancellationToken token);
         Task<IEntity?> AddEntityAsync(IEntity entity, CancellationToken token);
         Task<ICollection<IEntity>?> AddEntitiesAsync(ICollection<IEntity> collection, CancellationToken token);

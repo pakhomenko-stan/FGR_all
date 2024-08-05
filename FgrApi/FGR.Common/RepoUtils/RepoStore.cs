@@ -1,6 +1,8 @@
-﻿namespace FGR.Common.RepoUtils
+﻿using FGR.Common.Interfaces;
+
+namespace FGR.Common.RepoUtils
 {
-    public class RepoStore 
+    public class RepoStore : IRepoStore
     {
         private readonly Dictionary<int, object> store;
 
@@ -15,7 +17,7 @@
             if (!store.TryGetValue(tag, out object? value))
             {
                 var newEntry = createAction();
-                if (newEntry != null) 
+                if (newEntry != null)
                     store.Add(tag, newEntry);
                 return newEntry;
             }

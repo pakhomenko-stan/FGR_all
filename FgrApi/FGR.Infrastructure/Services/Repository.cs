@@ -157,11 +157,9 @@ namespace FGR.Infrastructure.Services
             return await _context.Set<T>().FindAsync([id], cancellationToken: token);
         }
 
-        public async Task<string> SaveAsync(CancellationToken token)
+        public async Task SaveAsync(CancellationToken token)
         {
             await _context.SaveChangesAsync(token);
-            var savePoint = $"savePoint_{Guid.NewGuid()}";
-            return savePoint;
         }
 
         public async Task<IEntity?> AddEntityAsync(IEntity entity, CancellationToken token)

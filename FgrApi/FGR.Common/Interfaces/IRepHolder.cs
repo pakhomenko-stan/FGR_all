@@ -6,7 +6,7 @@ namespace FGR.Common.Interfaces
     {
         IRepository<I> Repository<I>() where I : class;
         IRepo CustomRepository<IRepo>() where IRepo : class;
-        Task Transaction(Func<IRepHolder, Action<string>, Task> func);
-        Task<string> SaveAsync(CancellationToken token);
+        Task Transaction(Func<IRepHolder, Task> func);
+        Task SaveAsync(CancellationToken token);
     }
 }

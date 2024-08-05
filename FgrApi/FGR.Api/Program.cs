@@ -1,5 +1,6 @@
 using FGR.Application.Factories;
 using FGR.Application.Services;
+using FGR.Common.Options;
 using FGR.Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -12,6 +13,8 @@ namespace FGR.Api
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+
+            builder.Services.Configure<DalOptions>(builder.Configuration.GetSection("DalOptions"));
 
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"));

@@ -6,6 +6,7 @@ namespace FGR.Infrastructure
     internal class FgrContext(DbContextOptions<FgrContext> options) : DbContext(options)
     {
         virtual public DbSet<User> Users { get; set; }
+        virtual public DbSet<Role> Roles { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

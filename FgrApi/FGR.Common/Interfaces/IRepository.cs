@@ -11,7 +11,6 @@ namespace FGR.Common.Interfaces
     {
         void Dispose();
 
-
         IEntity AddEntity(IEntity entity);
         ICollection<IEntity> AddEntities(ICollection<IEntity> collection);
         void DeleteEntity(IEntity entity);
@@ -57,6 +56,6 @@ namespace FGR.Common.Interfaces
             bool includeDeleted = false, 
             CancellationToken token = default);
 
-        Task<string> SaveAsync(CancellationToken token);
+        Task SaveAsync(CancellationToken token);
     }
 }

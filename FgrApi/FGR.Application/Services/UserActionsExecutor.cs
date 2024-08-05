@@ -23,14 +23,21 @@ namespace FGR.Application.Services
         {
             await Task.CompletedTask;
             var user = input?.GetUser();
+            var role = input?.GetRole();
 
-            await RepHolder.Transaction(async (rep, savePointAction) =>
+            await RepHolder.Transaction(async rep =>
             {
-                if (user == null) throw new ArgumentNullException(nameof(input));
+                if (user == null || role == null) throw new ArgumentNullException(nameof(input));
+                var initName = user.Name;
+
+                var rol = await rep.Repository<IRole>().AddEntityAsync(role, token);
+                await rep.SaveAsync(token);
+
+                user.Name += $" with role: {rol?.Name ?? string.Empty}";
                 var usr = await rep.Repository<IUser>().AddEntityAsync(user, token);
-                var sp1 = await rep.SaveAsync(token);
-                savePointAction(sp1);
-                if ((usr?.Id ?? 0) < 1000) throw new Exception("Wrong Id of user");
+                await rep.SaveAsync(token);
+
+                if (initName.Replace(" ","").Equals("wronguser", StringComparison.CurrentCultureIgnoreCase)) throw new Exception("Wrong user!");
             });
 
             if (param is not null && param.GetType() != typeof(int) && param.GetType() != typeof(string)) throw new Exception("Wrong type of parameter ))");
@@ -46,6 +53,7 @@ namespace FGR.Application.Services
 
     static class UserExtensions
     {
-        public static IUser GetUser(this UserActionsExecutor.Request request) => new User { Id = request.Id, Name = request.Name };
+        public static IUser GetUser(this UserActionsExecutor.Request request) => new User { Name = request.Name };
+        public static IRole GetRole(this UserActionsExecutor.Request request) => new Role { Name = $"{request.Name}_ROLE" };
     }
 }

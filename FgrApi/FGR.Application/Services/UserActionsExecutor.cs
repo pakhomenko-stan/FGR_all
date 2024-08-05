@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.Text.Json;
+using System.Text.Json.Serialization;
 using CommonConverters;
 using FGR.Application.Services.Abstract;
 using FGR.Common.Interfaces;
@@ -33,7 +34,7 @@ namespace FGR.Application.Services
             await Task.CompletedTask;
             var user = input?.GetUser();
             var role = input?.GetRole();
-            var reply = string.Empty;
+            IUser? reply = null;
 
             await RepHolder.Transaction(async rep =>
             {
@@ -49,14 +50,14 @@ namespace FGR.Application.Services
 
                 if (initName.Replace(" ","").Equals("wronguser", StringComparison.CurrentCultureIgnoreCase)) throw new Exception("Wrong user!");
 
-                reply = usr?.GetReply()?.ToString() ?? string.Empty;
+                reply = usr;
             });
 
             if (param is not null && param.GetType() != typeof(int) && param.GetType() != typeof(string)) throw new Exception("Wrong type of parameter ))");
 
             var result = input is null
                     ? new Reply { Name = $"it is get request {param?.ToString() ?? string.Empty}" }
-                    : new Reply { Name = $"it is POST request {reply}" };
+                    : reply?.GetReply();
 
             return result;
         }
@@ -68,6 +69,6 @@ namespace FGR.Application.Services
         public static IUser GetUser(this UserActionsExecutor.Request request) => new User { Name = request.Name, CreatedDate = request.CreatedDate };
         public static IRole GetRole(this UserActionsExecutor.Request request) => new Role { Name = $"{request.Name}_ROLE" };
 
-        public static UserActionsExecutor.Reply GetReply(this IUser user) => new UserActionsExecutor.Reply { CreatedDate = user.CreatedDate, Name = user.Name };
+        public static UserActionsExecutor.Reply GetReply(this IUser user) => new() { CreatedDate = user.CreatedDate, Name = user.Name };
     }
 }

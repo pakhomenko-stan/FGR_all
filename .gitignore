@@ -16,3 +16,5 @@
 /FgrApi/FGR.Domain/obj
 /FgrApi/FGR.Infrastructure/bin/Debug/net8.0
 /FgrApi/FGR.Infrastructure/obj
+/FgrApi/CommonConverters/obj
+/FgrApi/CommonConverters/bin/Debug/net8.0

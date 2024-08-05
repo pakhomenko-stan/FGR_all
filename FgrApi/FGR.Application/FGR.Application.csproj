@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\CommonConverters\CommonConverters.csproj" />
     <ProjectReference Include="..\CommonInterfaces\CommonInterfaces.csproj" />
     <ProjectReference Include="..\FGR.Common\FGR.Common.csproj" />
     <ProjectReference Include="..\FGR.Domain\FGR.Domain.csproj" />

@@ -1,4 +1,6 @@
-﻿using FGR.Application.Services.Abstract;
+﻿using System.Text.Json.Serialization;
+using CommonConverters;
+using FGR.Application.Services.Abstract;
 using FGR.Common.Interfaces;
 using FGR.Domain.Interfaces;
 using FGR.Infrastructure.Models;
@@ -11,11 +13,18 @@ namespace FGR.Application.Services
         {
             public long Id { get; set; }
             public string Name { get; set; } = null!;
+
+            [JsonConverter(typeof(DateTimeShiftJsonConverter))]
+            public DateTime CreatedDate { get; set; }
+
         }
 
         public class Reply
         {
             public string Name { get; set; } = null!;
+
+            [JsonConverter(typeof(DateTimeShiftJsonConverter))]
+            public DateTime CreatedDate { get; set; }
 
         }
 
@@ -24,6 +33,7 @@ namespace FGR.Application.Services
             await Task.CompletedTask;
             var user = input?.GetUser();
             var role = input?.GetRole();
+            var reply = string.Empty;
 
             await RepHolder.Transaction(async rep =>
             {
@@ -38,13 +48,15 @@ namespace FGR.Application.Services
                 await rep.SaveAsync(token);
 
                 if (initName.Replace(" ","").Equals("wronguser", StringComparison.CurrentCultureIgnoreCase)) throw new Exception("Wrong user!");
+
+                reply = usr?.GetReply()?.ToString() ?? string.Empty;
             });
 
             if (param is not null && param.GetType() != typeof(int) && param.GetType() != typeof(string)) throw new Exception("Wrong type of parameter ))");
 
             var result = input is null
                     ? new Reply { Name = $"it is get request {param?.ToString() ?? string.Empty}" }
-                    : new Reply { Name = $"it is POST request {input?.Name ?? string.Empty}" };
+                    : new Reply { Name = $"it is POST request {reply}" };
 
             return result;
         }
@@ -53,7 +65,9 @@ namespace FGR.Application.Services
 
     static class UserExtensions
     {
-        public static IUser GetUser(this UserActionsExecutor.Request request) => new User { Name = request.Name };
+        public static IUser GetUser(this UserActionsExecutor.Request request) => new User { Name = request.Name, CreatedDate = request.CreatedDate };
         public static IRole GetRole(this UserActionsExecutor.Request request) => new Role { Name = $"{request.Name}_ROLE" };
+
+        public static UserActionsExecutor.Reply GetReply(this IUser user) => new UserActionsExecutor.Reply { CreatedDate = user.CreatedDate, Name = user.Name };
     }
 }

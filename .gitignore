@@ -18,3 +18,7 @@
 /FgrApi/FGR.Infrastructure/obj
 /FgrApi/CommonConverters/obj
 /FgrApi/CommonConverters/bin/Debug/net8.0
+/FgrApi/Authorization.Lib/obj/Debug/net8.0
+/FgrApi/Authorization.Core/bin/Debug/net6.0
+/FgrApi/Authorization.Core/obj
+/FgrApi/Authorization.Lib/obj

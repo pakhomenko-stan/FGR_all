@@ -1,5 +1,4 @@
-﻿using System.Text.Json;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 using CommonConverters;
 using FGR.Application.Services.Abstract;
 using FGR.Common.Interfaces;
@@ -48,7 +47,7 @@ namespace FGR.Application.Services
                 var usr = await rep.Repository<IUser>().AddEntityAsync(user, token);
                 await rep.SaveAsync(token);
 
-                if (initName.Replace(" ","").Equals("wronguser", StringComparison.CurrentCultureIgnoreCase)) throw new Exception("Wrong user!");
+                if (initName.Replace(" ", "").Equals("wronguser", StringComparison.CurrentCultureIgnoreCase)) throw new Exception("Wrong user!");
 
                 reply = usr;
             });

@@ -1,0 +1,15 @@
+﻿@page
+@model AccessDeniedModel
+@{
+    ViewData["Title"] = "Access denied";
+}
+
+<header>
+    <h2 class="text-danger" style="text-align:center">@ViewData["Title"]</h2>
+    <p class="text-danger">You do not have access to this resource.</p>
+</header>
+<form asp-page-handler="Confirmation" method="post">
+    <div class="row justify-content-center p-5">
+        <button type="submit" class="btn btn-default">Back to login page</button>
+    </div>
+</form>

@@ -21,6 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Authorization.Lib\Authorization.Lib.csproj" />
     <ProjectReference Include="..\CommonInterfaces\CommonInterfaces.csproj" />
     <ProjectReference Include="..\FGR.Application\FGR.Application.csproj" />
     <ProjectReference Include="..\FGR.Common\FGR.Common.csproj" />

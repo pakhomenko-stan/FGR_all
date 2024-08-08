@@ -45,7 +45,7 @@ public static class ClientHandler
         await RenewClientApp(FgrTermsHelper.WebClientId, manager, descriptor, cancellationToken);
     }
 
-    public static async Task AddResourceServerClient(IOpenIddictApplicationManager manager, IFgrApiConfig config, string scope = FgrTermsHelper.PaymentScope, CancellationToken cancellationToken = default)
+    public static async Task AddResourceServerClient(IOpenIddictApplicationManager manager, IFgrClientConfig config, string scope = FgrTermsHelper.AdminUIScope, CancellationToken cancellationToken = default)
     {
         await RenewClientApp(config.ClientId, manager, new OpenIddictApplicationDescriptor
         {

@@ -9,9 +9,17 @@
   <ItemGroup>
 	<FrameworkReference Include="Microsoft.AspNetCore.App" />
 	<PackageReference Include="IdentityModel" Version="7.0.0" />
+	<PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.7" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.1" />
     <PackageReference Include="OpenIddict.Abstractions" Version="5.7.0" />
+    <PackageReference Include="OpenIddict.AspNetCore" Version="5.7.0" />
+    <PackageReference Include="OpenIddict.EntityFrameworkCore" Version="5.7.0" />
     <PackageReference Include="Refit" Version="7.1.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Authorization.Core\Authorization.Core.csproj" />
+    <ProjectReference Include="..\CommonInterfaces\CommonInterfaces.csproj" />
   </ItemGroup>
 
 </Project>

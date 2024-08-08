@@ -23,14 +23,14 @@ using Newtonsoft.Json.Linq;
 using OpenIddict.Abstractions;
 using OpenIddict.Server.AspNetCore;
 using static OpenIddict.Abstractions.OpenIddictConstants;
-using Authorization.Lib.Interfaces;
+using Authorization.Lib.Interfaces.Options;
 
 namespace Authorization.SSO.Controllers
 {
     public class AuthorizationController(IOpenIddictApplicationManager applicationManager,
         IOpenIddictAuthorizationManager authorizationManager,
         IOpenIddictScopeManager scopeManager,
-        IFgrApiConfig config,
+        IFgrApiOptions config,
         SignInManager<User> signInManager,
         UserManager<User> userManager,
         ILogger<AuthorizationController> logger) : Controller

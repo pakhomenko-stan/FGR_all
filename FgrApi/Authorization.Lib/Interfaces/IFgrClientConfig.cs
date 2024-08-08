@@ -1,6 +1,6 @@
 ﻿namespace Authorization.Lib.Interfaces
 {
-    public interface IFgrApiConfig
+    public interface IFgrClientConfig
     {
         string BaseUrl { get; set; }
         string ClientId { get; set; }

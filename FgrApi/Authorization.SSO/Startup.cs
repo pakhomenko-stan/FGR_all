@@ -1,8 +1,8 @@
 using System.Globalization;
 using System.Linq;
-using Authorization.Core;
 using Authorization.Core.Infrastructure;
 using Authorization.Lib.Helpers;
+using Authorization.SSO.Extensions;
 using Authorization.SSO.Filters;
 using Authorization.SSO.Hosts;
 using Authorization.SSO.Options;
@@ -16,6 +16,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Logging;
+using Authorization.Core;
 using static OpenIddict.Abstractions.OpenIddictConstants;
 
 namespace Authorization.SSO
@@ -34,7 +35,7 @@ namespace Authorization.SSO
             var msOptions = Configuration.GetSection("Microsoft").Get<MicrosoftOptions>();
             services.Configure<ServerOptions>(serverOptionsConfig);
 
-            services.AddAuthenticationServerDbConfig(serverOptions.IdentityDbConnectString, this);
+            services.AddAuthenticationServerDbConfig<AuthenticationDbContext>(serverOptions.IdentityDbConnectString, this);
             services.AddAuthentication()
                 .AddMicrosoftAccount(options =>
                 {
@@ -64,7 +65,8 @@ namespace Authorization.SSO
                     configuration
                         .RegisterScopes(Scopes.OpenId, Scopes.Profile, Scopes.OfflineAccess, Scopes.Roles)
                         .SetTokenEndpointUris("/" + FgrTermsHelper.tokenRoute)
-                        .AllowClientCredentialsFlow();
+                        .AllowClientCredentialsFlow()
+                        .AddOpenIddictServerUserActions();
 
                     if (serverOptions.UseDevelopmentCertificates)
                     {

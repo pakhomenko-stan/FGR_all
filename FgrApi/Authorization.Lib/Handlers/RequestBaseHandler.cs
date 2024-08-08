@@ -1,10 +1,11 @@
 ﻿using System.Net.Http.Headers;
-using Authorization.Lib.Interfaces;
+using Authorization.Lib.Helpers;
+using Authorization.Lib.Interfaces.Options;
 using IdentityModel.Client;
 
 namespace Authorization.Lib.Handlers
 {
-    public abstract class RequestBaseHandler(IFgrApiConfig _config, string handlerScope) : DelegatingHandler
+    public abstract class RequestBaseHandler(IFgrApiOptions _config, string handlerScope) : DelegatingHandler
     {
         private async Task<TokenResponse> RequestClientCredentialsTokenAsync(ClientCredentialsTokenRequest request, CancellationToken cancellationToken = default)
         {
@@ -39,7 +40,7 @@ namespace Authorization.Lib.Handlers
             //potentially refresh token here if it has expired etc.
             var tokenResponse = await RequestClientCredentialsTokenAsync(new ClientCredentialsTokenRequest
             {
-                Address = $"{_config.BaseUrl}connect/token",
+                Address = $"{_config.BaseUrl}{FgrTermsHelper.tokenRoute}",
                 ClientId = _config.ClientId,
                 ClientSecret = _config.ClientSecret,
                 Scope = handlerScope

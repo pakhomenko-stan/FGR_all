@@ -1,36 +1,23 @@
 ﻿using Authorization.Core.Infrastructure;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using static OpenIddict.Abstractions.OpenIddictConstants;
 
 namespace Authorization.Core;
 
 public static class AuthServerConfig
 {
-    public static void AddAuthenticationServerDbConfig(this IServiceCollection services, string connectString, object caller)
+    public static void AddAuthenticationServerDbConfig<TContext>(this IServiceCollection services, string connectString, int? timeOut) where TContext : DbContext
     {
-        var migrationAssembly = caller.GetType().Assembly.GetName().Name;
+        var migrationAssembly = typeof(TContext).Assembly.FullName;
 
         services.AddDbContext<AuthenticationDbContext>(options =>
         {
-            options.UseSqlServer(connectString, opt => opt.MigrationsAssembly(migrationAssembly));
+            options.UseSqlServer(connectString, opt =>
+            {
+                opt.MigrationsAssembly(migrationAssembly);
+                opt.CommandTimeout(timeOut ?? 30);
+            });
             options.UseOpenIddict<long>();
-        });
-
-
-        //??
-        services.Configure<IdentityOptions>(options =>
-        {
-            options.ClaimsIdentity.UserNameClaimType = Claims.Name;
-            options.ClaimsIdentity.UserIdClaimType = Claims.Subject;
-            options.ClaimsIdentity.RoleClaimType = Claims.Role;
-            options.Password.RequireNonAlphanumeric = false;
-            options.Password.RequiredUniqueChars = 1;
-            options.Password.RequireDigit = false;
-            options.Password.RequiredLength = 1;
-            options.Password.RequireLowercase = false;
-            options.Password.RequireUppercase = false;
         });
     }
 }

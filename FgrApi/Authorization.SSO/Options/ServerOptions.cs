@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
-using Authorization.Lib.Interfaces;
+using Authorization.Lib.Interfaces.Options;
 
 namespace Authorization.SSO
 {
-    public class ServerOptions: IFgrApiConfig
+    public class ServerOptions: IFgrApiOptions
     {
 
         public IEnumerable<string> ApiClientUris { get; set; }

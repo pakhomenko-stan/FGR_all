@@ -25,5 +25,8 @@
 /FgrApi/Authorization.SSO/.config
 /FgrApi/Authorization.SSO/.vs/Authorization.SSO
 /FgrApi/Authorization.SSO/obj
-/FgrApi/Authorization.SSO/Properties/PublishProfiles
-/FgrApi/Authorization.SSO/Properties
+/FgrApi/Authorization.Core/bin/Debug/net8.0
+/FgrApi/Authorization.Lib/bin/Debug/net8.0
+/FgrApi/Authorization.MailKitSender/obj
+/FgrApi/Authorization.SSO/bin/Debug/net8.0
+/FgrApi/Authorization.MailKitSender/bin/Debug/net6.0

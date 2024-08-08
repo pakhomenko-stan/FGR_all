@@ -1,10 +1,11 @@
 using System.Globalization;
 using System.Linq;
 using Authorization.Core;
+using Authorization.Core.Infrastructure;
+using Authorization.Lib.Helpers;
 using Authorization.SSO.Filters;
 using Authorization.SSO.Hosts;
 using Authorization.SSO.Options;
-using Authorization.SSO.Providers;
 using Authorization.SSO.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -19,15 +20,10 @@ using static OpenIddict.Abstractions.OpenIddictConstants;
 
 namespace Authorization.SSO
 {
-    public class Startup
+    public class Startup(
+        IConfiguration configuration)
     {
-        public Startup(
-            IConfiguration configuration)
-        {
-            Configuration = configuration;
-        }
-
-        public IConfiguration Configuration { get; }
+        public IConfiguration Configuration { get; } = configuration;
 
         public void ConfigureServices(IServiceCollection services)
         {
@@ -38,7 +34,7 @@ namespace Authorization.SSO
             var msOptions = Configuration.GetSection("Microsoft").Get<MicrosoftOptions>();
             services.Configure<ServerOptions>(serverOptionsConfig);
 
-            services.AddAuthenticationServerConfig(serverOptions.IdentityDbConnectString, this);
+            services.AddAuthenticationServerDbConfig(serverOptions.IdentityDbConnectString, this);
             services.AddAuthentication()
                 .AddMicrosoftAccount(options =>
                 {
@@ -67,14 +63,7 @@ namespace Authorization.SSO
                 {
                     configuration
                         .RegisterScopes(Scopes.OpenId, Scopes.Profile, Scopes.OfflineAccess, Scopes.Roles)
-                        .SetTokenEndpointUris("/" + AuthParams.AuthParams.tokenRoute)
-                        .SetAuthorizationEndpointUris("/" + AuthParams.AuthParams.autorizeRoute)
-                        .SetUserinfoEndpointUris("/" + AuthParams.AuthParams.userInfoRoute)
-                        .SetLogoutEndpointUris("/" + AuthParams.AuthParams.logoutRoute)
-                        .AllowAuthorizationCodeFlow()
-                        .AllowPasswordFlow()
-                        .AllowRefreshTokenFlow()
-                        .AllowImplicitFlow()
+                        .SetTokenEndpointUris("/" + FgrTermsHelper.tokenRoute)
                         .AllowClientCredentialsFlow();
 
                     if (serverOptions.UseDevelopmentCertificates)
@@ -117,7 +106,6 @@ namespace Authorization.SSO
             });
             services.AddSingleton(s => serverOptions);
             services.AddSingleton<IEmailSender, EmailService>();
-            services.AddSingleton<ListProvider>();
             services.AddScoped<RequestAddressFilter>();
 
             services.AddHostedService<AuthWorker>();

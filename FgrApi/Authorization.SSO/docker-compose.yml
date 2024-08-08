@@ -6,7 +6,7 @@ services:
   extra_hosts:
    - "host.docker.internal:host-gateway"
   environment:
-   - Kestrel__CertPath=Certificates/wildcard_prosmar-no_azure_certificate.pfx
+   - Kestrel__CertPath=Certificates/certificate.pfx
    - ServerOptions__UseDevelopmentCertificates=true
    - ASPNETCORE_ENVIRONMENT=$ASPNETCORE_ENVIRONMENT
    #- ServerOptions__IdentityDbConnectString=Data Source=tradeblotter.database.windows.net; Initial Catalog=IdentityDev; Integrated Security=False; User ID=tradeblotteradmin; Password=AliEgBilsol022; MultipleActiveResultSets=False

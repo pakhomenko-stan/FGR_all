@@ -5,11 +5,10 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Authorization.Core.Models;
+using Authorization.Lib.Helpers;
 using Authorization.SSO.Attributes;
-using Authorization.SSO.Extensions;
 using Authorization.SSO.ViewModels;
-using Common.Interfaces;
-using Common.Logging;
+using Authorization.SSO.Extensions;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
@@ -24,40 +23,31 @@ using Newtonsoft.Json.Linq;
 using OpenIddict.Abstractions;
 using OpenIddict.Server.AspNetCore;
 using static OpenIddict.Abstractions.OpenIddictConstants;
+using Authorization.Lib.Interfaces;
 
 namespace Authorization.SSO.Controllers
 {
-    [LoggingFilter]
-    public class AuthorizationController : Controller
+    public class AuthorizationController(IOpenIddictApplicationManager applicationManager,
+        IOpenIddictAuthorizationManager authorizationManager,
+        IOpenIddictScopeManager scopeManager,
+        IFgrApiConfig config,
+        SignInManager<User> signInManager,
+        UserManager<User> userManager,
+        ILogger<AuthorizationController> logger) : Controller
     {
 
-        private readonly IOpenIddictApplicationManager _applicationManager;
-        private readonly IOpenIddictAuthorizationManager _authorizationManager;
-        private readonly IOpenIddictScopeManager _scopeManager;
-        private readonly SignInManager<User> _signInManager;
-        private readonly UserManager<User> _userManager;
-        private readonly ILogger<AuthorizationController> _logger;
-
-        public AuthorizationController(IOpenIddictApplicationManager applicationManager,
-            IOpenIddictAuthorizationManager authorizationManager,
-            IOpenIddictScopeManager scopeManager,
-            SignInManager<User> signInManager,
-            UserManager<User> userManager,
-            ILogger<AuthorizationController> logger)
-        {
-            _applicationManager = applicationManager;
-            _authorizationManager = authorizationManager;
-            _scopeManager = scopeManager;
-            _signInManager = signInManager;
-            _userManager = userManager;
-            _logger = logger;
-        }
+        private readonly IOpenIddictApplicationManager _applicationManager = applicationManager;
+        private readonly IOpenIddictAuthorizationManager _authorizationManager = authorizationManager;
+        private readonly IOpenIddictScopeManager _scopeManager = scopeManager;
+        private readonly SignInManager<User> _signInManager = signInManager;
+        private readonly UserManager<User> _userManager = userManager;
+        private readonly ILogger<AuthorizationController> _logger = logger;
 
         /// <summary>
         /// Main authorization
         /// </summary>
-        [HttpGet("~/" + AuthParams.AuthParams.autorizeRoute)]
-        [HttpPost("~/" + AuthParams.AuthParams.autorizeRoute)]
+        [HttpGet("~/" + FgrTermsHelper.autorizeRoute)]
+        [HttpPost("~/" + FgrTermsHelper.autorizeRoute)]
         [IgnoreAntiforgeryToken]
         public async Task<IActionResult> Authorize()
         {
@@ -108,7 +98,7 @@ namespace Authorization.SSO.Controllers
         /// Accepted authorization as result of consent request (user allows for application use auth data)
         /// </summary>
         [Authorize, FormValueRequired("submit.Accept")]
-        [HttpPost("~/" + AuthParams.AuthParams.autorizeRoute), ValidateAntiForgeryToken]
+        [HttpPost("~/" + FgrTermsHelper.autorizeRoute), ValidateAntiForgeryToken]
         public async Task<IActionResult> Accept()
         {
             var request = HttpContext.GetOpenIddictServerRequest() ??
@@ -132,14 +122,14 @@ namespace Authorization.SSO.Controllers
         /// Denied authorization as result of consent request (user prohibits for application use auth data)
         /// </summary>
         [Authorize, FormValueRequired("submit.Deny")]
-        [HttpPost("~/" + AuthParams.AuthParams.autorizeRoute), ValidateAntiForgeryToken]
+        [HttpPost("~/" + FgrTermsHelper.autorizeRoute), ValidateAntiForgeryToken]
         public IActionResult Deny() => Forbid(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
 
         /// <summary>
         /// Get logout with redirect to logout page
         /// </summary>
         /// <returns></returns>
-        [HttpGet("~/" + AuthParams.AuthParams.logoutRoute)]
+        [HttpGet("~/" + FgrTermsHelper.logoutRoute)]
         public async Task<IActionResult> Logout() => await LogoutPost();
 
         /// <summary> 
@@ -147,7 +137,7 @@ namespace Authorization.SSO.Controllers
         /// to the post_logout_redirect_uri specified by the client application or to 
         /// the RedirectUri specified in the authentication properties if none was set.
         /// </summary>
-        [ActionName(nameof(Logout)), HttpPost("~/" + AuthParams.AuthParams.logoutRoute), ValidateAntiForgeryToken]
+        [ActionName(nameof(Logout)), HttpPost("~/" + FgrTermsHelper.logoutRoute), ValidateAntiForgeryToken]
         public async Task<IActionResult> LogoutPost()
         {
             await _signInManager.SignOutAsync();
@@ -157,14 +147,14 @@ namespace Authorization.SSO.Controllers
                 properties: new AuthenticationProperties { RedirectUri = "/" });
         }
 
-        [HttpGet("~/" + AuthParams.AuthParams.tokenApiRoute)]
-        [HttpPost("~/" + AuthParams.AuthParams.tokenApiRoute)]
+        [HttpGet("~/" + FgrTermsHelper.tokenApiRoute)]
+        [HttpPost("~/" + FgrTermsHelper.tokenApiRoute)]
         public IActionResult ExchangeApi(string username, string password)
         {
             var client = new System.Net.Http.HttpClient();
             var request = new System.Net.Http.FormUrlEncodedContent(new Dictionary<string, string>
             {
-                ["client_id"] = AuthParams.AuthParams.webClientId,
+                ["client_id"] = config.ClientId,
                 ["grant_type"] = "password",
                 ["username"] = username,
                 ["password"] = password
@@ -172,12 +162,12 @@ namespace Authorization.SSO.Controllers
 
             var uri = Url.Action(action: "Exchange", controller: "Authorization", values: null, protocol: Request.Scheme);
 
-            _logger.LogInformation($"Forwarding token request to {uri}");
+            _logger.LogInformation("Forwarding token request to {Uri}", uri);
 
             var reply = client.PostAsync(uri, request).GetAwaiter().GetResult();
             var replyJson = reply.Content.ReadAsStringAsync().GetAwaiter().GetResult();
 
-            _logger.LogInformation($"Forwared token request response: {replyJson}");
+            _logger.LogInformation("Forwared token request response: {ReplyJson}", replyJson);
 
             var replyObject = JsonConvert.DeserializeObject<JToken>(replyJson);
 
@@ -192,7 +182,7 @@ namespace Authorization.SSO.Controllers
         /// Supply access token as reply to request with username/password or to request with refresh token
         /// </summary>
         /// <returns></returns>
-        [HttpPost("~/" + AuthParams.AuthParams.tokenRoute), Produces("application/json")]
+        [HttpPost("~/" + FgrTermsHelper.tokenRoute), Produces("application/json")]
         public async Task<IActionResult> Exchange()
         {
             var request = HttpContext.GetOpenIddictServerRequest() ??
@@ -219,24 +209,22 @@ namespace Authorization.SSO.Controllers
         }
 
         [Authorize(AuthenticationSchemes = OpenIddictServerAspNetCoreDefaults.AuthenticationScheme)]
-        [HttpGet("~/" + AuthParams.AuthParams.userInfoRoute)]
+        [HttpGet("~/" + FgrTermsHelper.userInfoRoute)]
         public async Task<IActionResult> Userinfo()
         {
             var claimsPrincipal = (await HttpContext.AuthenticateAsync(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme)).Principal;
             var user = await _userManager.GetUserAsync(claimsPrincipal);
-            //return Ok(JsonConvert.SerializeObject(user.Model(), typeof(IUser), new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Auto }));
-            var userModel = user.Model();
-            return Ok(userModel);
+            return Ok(user);
         }
 
         #region Private methods
         private static IEnumerable<string> FullClaimsDestinations
         {
-            get => new[]
-            {
+            get =>
+            [
                 Destinations.AccessToken,
                 Destinations.IdentityToken
-            };
+            ];
         }
 
         private async Task<IActionResult> SignInServerClient(OpenIddictRequest request)
@@ -244,11 +232,7 @@ namespace Authorization.SSO.Controllers
             // Note: the client credentials are automatically validated by OpenIddict:
             // if client_id or client_secret are invalid, this action won't be invoked.
 
-            var application = await _applicationManager.FindByClientIdAsync(request.ClientId);
-            if (application == null)
-            {
-                throw new InvalidOperationException("The application details cannot be found in the database.");
-            }
+            var application = await _applicationManager.FindByClientIdAsync(request.ClientId) ?? throw new InvalidOperationException("The application details cannot be found in the database.");
 
             // Create the claims-based identity that will be used by OpenIddict to generate tokens.
             var identity = new ClaimsIdentity(
@@ -257,8 +241,8 @@ namespace Authorization.SSO.Controllers
                 roleType: Claims.Role);
 
             // Add the claims that will be persisted in the tokens (use the client_id as the subject identifier).
-            identity.SetClaims(Claims.Subject, await _applicationManager.GetClientIdAsync(application));
-            identity.SetClaims(Claims.Name, await _applicationManager.GetDisplayNameAsync(application));
+            identity.SetClaim(Claims.Subject, await _applicationManager.GetClientIdAsync(application));
+            identity.SetClaim(Claims.Name, await _applicationManager.GetDisplayNameAsync(application));
 
 
             return SignIn(new ClaimsPrincipal(identity), OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
@@ -292,8 +276,8 @@ namespace Authorization.SSO.Controllers
             Claims.Email when principal.HasScope(Scopes.Email) => FullClaimsDestinations,
             Claims.Role when principal.HasScope(Scopes.Roles) => FullClaimsDestinations,
             Claims.Profile when principal.HasScope(Scopes.Profile) => FullClaimsDestinations,
-            "secret_value" => Array.Empty<string>(),
-            _ => new[] { Destinations.AccessToken }
+            "secret_value" => [],
+            _ => [Destinations.AccessToken]
         };
 
         private static void SetClaimDestinations(ClaimsPrincipal principal) =>
@@ -360,7 +344,7 @@ namespace Authorization.SSO.Controllers
         {
             if (request.HasPrompt(Prompts.None))
                 return ForbidClause(Errors.LoginRequired, "The user is not logged in.");
-            return ChallengeClause(Request.HasFormContentType ? Request.Form.ToList() : Request.Query.ToList());
+            return ChallengeClause(Request.HasFormContentType ? [.. Request.Form] : Request.Query.ToList());
         }
 
         private ChallengeResult LoginRequestRedirect(OpenIddictRequest request)

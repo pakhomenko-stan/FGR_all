@@ -1,26 +1,21 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
+using Common.MailKit;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MimeKit;
-using Common.MailKit;
 
 namespace Authorization.SSO.Services
 {
-    public class EmailService : IEmailSender
+    public class EmailService(
+        IOptions<ServerOptions> options,
+        ILogger<EmailService> logger) : IEmailSender
     {
-        private readonly ServerOptions options;
-        private readonly ILogger<EmailService> logger;
+        private readonly ServerOptions options = options.Value;
+        private readonly ILogger<EmailService> logger = logger;
+        private static readonly string[] separator = [";"];
 
-        public EmailService(
-            IOptions<ServerOptions> options,
-            ILogger<EmailService> logger)
-        {
-            this.options = options.Value;
-            this.logger = logger;
-        }
         public async Task SendEmailAsync(string email, string subject, string htmlMessage)
         {
             if (options.UseSmtp)
@@ -29,16 +24,16 @@ namespace Authorization.SSO.Services
             }
         }
 
-        public async Task SendEmail(string subject, string body, string recipient, string[] bcc = null, List<string> attachmentsPath = null)
+        public async Task SendEmail(string subject, string body, string recipient, string[] bcc = null)
         {
             if (string.IsNullOrEmpty(recipient))
                 return;
 
             try
             {
-                MimeMessage mail =  MailSender.GetMimeMessage(options.EmailFrom, subject);
+                MimeMessage mail = MailSender.GetMimeMessage(options.EmailFrom, subject);
 
-                foreach (var address in recipient.Split(new[] { ";" }, StringSplitOptions.RemoveEmptyEntries))
+                foreach (var address in recipient.Split(separator, StringSplitOptions.RemoveEmptyEntries))
                 {
                     if (!string.IsNullOrEmpty(address))
                     {
@@ -48,7 +43,7 @@ namespace Authorization.SSO.Services
                         }
                         catch (Exception e)
                         {
-                            logger.LogError(string.Format("Error set recipient: {0}.  {1}. StackTrace: {2}", address, e.Message, e.StackTrace));
+                            logger.LogError("Error set recipient: {Address}.  {Message}. StackTrace: {Trace}", address, e.Message, e.StackTrace);
                         }
                     }
                 }
@@ -65,7 +60,7 @@ namespace Authorization.SSO.Services
                             }
                             catch (Exception e)
                             {
-                                logger.LogError(string.Format("Error set bcc: {0}.  {1}. StackTrace: {2}", address, e.Message, e.StackTrace));
+                                logger.LogError("Error set bcc: {Address}.  {Message}. StackTrace: {Trace}", address, e.Message, e.StackTrace);
                             }
                         }
                     }
@@ -75,7 +70,7 @@ namespace Authorization.SSO.Services
             }
             catch (Exception e)
             {
-                logger.LogError(string.Format("Error sending email: {0}. StackTrace: {1}", e.Message, e.StackTrace));
+                logger.LogError("Error sending email: {Message}. StackTrace: {Trace}", e.Message, e.StackTrace);
             }
         }
 

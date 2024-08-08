@@ -1,8 +1,6 @@
-﻿using Common.Interfaces.Options;
-
-namespace Authorization.SSO.Options
+﻿namespace Authorization.SSO.Options
 {
-    public class MicrosoftOptions : IExternalProviderOprtions
+    public class MicrosoftOptions
     {
         public string ClientId { get; set; }
         public string ClientSecret { get; set; }

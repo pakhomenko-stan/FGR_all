@@ -1,14 +1,19 @@
-﻿namespace Authorization.SSO.Hosts
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using Authorization.Core.Infrastructure;
+using Authorization.Lib.Handlers;
+using Authorization.Lib.Helpers;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using OpenIddict.Abstractions;
+
+namespace Authorization.SSO.Hosts
 {
-    internal class AuthWorker : IHostedService
+    internal class AuthWorker(IServiceProvider serviceProvider) : IHostedService
     {
-        private readonly IServiceProvider serviceProvider;
-
-        public AuthWorker(IServiceProvider serviceProvider)
-        {
-            this.serviceProvider = serviceProvider;
-        }
-
         public async Task StartAsync(CancellationToken cancellationToken)
         {
             using var scope = serviceProvider.CreateScope();
@@ -28,9 +33,8 @@
             var inUris = BuildRedirectUriPool(options.ApiClientUris, options.AllowedRedirectUris);
             var outUris = BuildRedirectUriPool(options.ApiClientUris, options.LogoutUris);
 
-            await ClientHelper.AddWebClient(manager, inUris, outUris, cancellationToken);
-            await ClientHelper.AddPostmanClient(manager, cancellationToken);
-            await ClientHelper.AddResourceServerClient(manager, cancellationToken);
+            await ClientHandler.AddWebClient(manager, inUris, outUris, cancellationToken);
+            await ClientHandler.AddResourceServerClient(manager, options, scope: FgrTermsHelper.AdminUIScope, cancellationToken: cancellationToken);
         }
 
         private static IEnumerable<Uri> BuildRedirectUriPool(IEnumerable<string> uriBase, IEnumerable<string> allowedRedirectUris) =>

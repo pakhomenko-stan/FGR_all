@@ -1,5 +1,5 @@
 using System.Reflection;
-using Common.Models.Options;
+using Authorization.SSO.Options;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;

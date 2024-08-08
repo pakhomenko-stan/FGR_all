@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Configuration;
 using System.Linq;
 using System.Threading.Tasks;
 using Authorization.Core.Models;
@@ -9,33 +8,20 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace Authorization.SSO.Areas.Identity.Pages.Account
 {
     [AllowAnonymous]
-    public class LoginModel : PageModel
+    public class LoginModel(SignInManager<User> signInManager,
+        ILogger<LoginModel> logger,
+        UserManager<User> userManager) : PageModel
     {
-        private readonly UserManager<User> _userManager;
-        private readonly SignInManager<User> _signInManager;
-        private readonly ILogger<LoginModel> _logger;
-        private readonly string replaceableProviderName;
-        private readonly string replacingName;
-        private readonly IConfiguration Configuration;
-
-        public LoginModel(SignInManager<User> signInManager,
-            ILogger<LoginModel> logger,
-            UserManager<User> userManager,
-            IConfiguration configuration)
-        {
-            _userManager = userManager;
-            _signInManager = signInManager;
-            _logger = logger;
-            replaceableProviderName = "OpenIdConnect";
-            replacingName = "OKTA";
-            Configuration = configuration;
-        }
+        private readonly UserManager<User> _userManager = userManager;
+        private readonly SignInManager<User> _signInManager = signInManager;
+        private readonly ILogger<LoginModel> _logger = logger;
+        private readonly string replaceableProviderName = "OpenIdConnect";
+        private readonly string replacingName = "OKTA";
 
         [BindProperty]
         public InputModel Input { get; set; }

@@ -1,5 +1,4 @@
-﻿using Common.Logging;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Authorization.SSO.Areas.Identity.Controllers
@@ -7,7 +6,6 @@ namespace Authorization.SSO.Areas.Identity.Controllers
     [Authorize]
     public class AccountController : Controller
     {
-        [LoggingFilter]
         [AllowAnonymous]
         public IActionResult Login(string returnUrl = null)
         {

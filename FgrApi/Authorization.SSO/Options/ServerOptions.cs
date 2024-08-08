@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
+using Authorization.Lib.Interfaces;
 
 namespace Authorization.SSO
 {
-    public class ServerOptions
+    public class ServerOptions: IFgrApiConfig
     {
 
         public IEnumerable<string> ApiClientUris { get; set; }
@@ -22,5 +23,11 @@ namespace Authorization.SSO
         public bool EnableHttps { get; set; }
         public bool UseDevelopmentCertificates { get; set; }
         public string Homepage { get; set; }
+
+        //Allowed Admin client config
+        public string BaseUrl { get; set; }
+        public string ClientId { get; set; }
+        public string ClientSecret { get; set; }
+        public string ClientDisplayName { get; set; }
     }
 }

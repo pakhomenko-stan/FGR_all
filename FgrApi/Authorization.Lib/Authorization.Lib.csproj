@@ -8,15 +8,10 @@
 
   <ItemGroup>
 	<FrameworkReference Include="Microsoft.AspNetCore.App" />
+	<PackageReference Include="IdentityModel" Version="7.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.1" />
+    <PackageReference Include="OpenIddict.Abstractions" Version="5.7.0" />
     <PackageReference Include="Refit" Version="7.1.2" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Models\" />
-    <Folder Include="Interfaces\" />
-    <Folder Include="Handlers\" />
-    <Folder Include="Helpers\" />
   </ItemGroup>
 
 </Project>

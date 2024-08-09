@@ -3,7 +3,6 @@ using Authorization.Lib.Filters;
 using Authorization.Lib.Helpers;
 using FGR.Common.Interfaces;
 using FGR.Domain.Interfaces;
-using IdentityModel.Client;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
@@ -36,6 +35,26 @@ namespace FGR.Api.Controllers
         }
 
         #region Private methods
+        private static IEnumerable<string> FullClaimsDestinations
+        {
+            get =>
+            [
+                Destinations.AccessToken,
+                Destinations.IdentityToken
+            ];
+        }
+
+        private static IEnumerable<string> GetDestinations(Claim claim) => 
+            claim.Type switch
+            {
+                "secret_value" => [],
+                _ => [Destinations.AccessToken]
+            };
+
+        private static void SetClaimDestinations(ClaimsPrincipal principal) =>
+            principal.Claims.ToList().ForEach(claim => claim.SetDestinations(GetDestinations(claim)));
+
+
         private async Task<IActionResult> SignInServerClient(OpenIddictRequest request)
         {
             // Note: the client credentials are automatically validated by OpenIddict:
@@ -44,7 +63,7 @@ namespace FGR.Api.Controllers
             var application = await applicationManager.FindByClientIdAsync(request?.ClientId ?? string.Empty)
                 ?? throw new InvalidOperationException("The application details cannot be found in the database.");
 
-            var scope = request?.Claims.TryGetStringArray("scope")?.FirstOrDefault() ?? string.Empty;
+            var scope = request?.Scope;
             var clientId = request?.ClientId;
 
             string[] scopes = [FgrTermsHelper.AdminUIScope, FgrTermsHelper.PaymentScope];
@@ -59,9 +78,13 @@ namespace FGR.Api.Controllers
             // Add the claims that will be persisted in the tokens (use the client_id as the subject identifier).
             identity.SetClaim(Claims.Subject, await applicationManager.GetClientIdAsync(application));
             identity.SetClaim(Claims.Name, await applicationManager.GetDisplayNameAsync(application));
+            identity.AddClaim(Claims.Scope, scope);
             AppendClaims(identity, scope, clientId);
 
-            return SignIn(new ClaimsPrincipal(identity), OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
+            var principal = new ClaimsPrincipal(identity);
+            SetClaimDestinations(principal);
+
+            return SignIn(principal, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
         }
 
         private void AppendClaims(ClaimsIdentity identity, string scope, string? clientId = null)

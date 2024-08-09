@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.Security.Claims;
+using System.Text.Json.Serialization;
 using CommonConverters;
 using FGR.Application.Services.Abstract;
 using FGR.Common.Interfaces;
@@ -28,34 +29,37 @@ namespace FGR.Application.Services
 
         }
 
-        protected override async Task<Reply?> ExecuteGenericAsync<TPar>(TPar? param, Request? input, CancellationToken token) where TPar : default
+        protected override async Task<Reply?> ExecuteGenericAsync<TPar>(TPar? param, Request? input, ClaimsPrincipal principal, CancellationToken token) where TPar : default
         {
             await Task.CompletedTask;
             var user = input?.GetUser();
             var role = input?.GetRole();
             IUser? reply = null;
 
-            await RepHolder.Transaction(async rep =>
+            if (input is not null)
             {
-                if (user == null || role == null) throw new ArgumentNullException(nameof(input));
-                var initName = user.Name;
+                await RepHolder.Transaction(async rep =>
+                {
+                    if (user == null || role == null) throw new ArgumentNullException(nameof(input));
+                    var initName = user.Name;
 
-                var rol = await rep.Repository<IRole>().AddEntityAsync(role, token);
-                await rep.SaveAsync(token);
+                    var rol = await rep.Repository<IRole>().AddEntityAsync(role, token);
+                    await rep.SaveAsync(token);
 
-                user.Name += $" with role: {rol?.Name ?? string.Empty}";
-                var usr = await rep.Repository<IUser>().AddEntityAsync(user, token);
-                await rep.SaveAsync(token);
+                    user.Name += $" with role: {rol?.Name ?? string.Empty}";
+                    var usr = await rep.Repository<IUser>().AddEntityAsync(user, token);
+                    await rep.SaveAsync(token);
 
-                if (initName.Replace(" ", "").Equals("wronguser", StringComparison.CurrentCultureIgnoreCase)) throw new Exception("Wrong user!");
+                    if (initName.Replace(" ", "").Equals("wronguser", StringComparison.CurrentCultureIgnoreCase)) throw new Exception("Wrong user!");
 
-                reply = usr;
-            });
+                    reply = usr;
+                });
+            }
 
             if (param is not null && param.GetType() != typeof(int) && param.GetType() != typeof(string)) throw new Exception("Wrong type of parameter ))");
 
             var result = input is null
-                    ? new Reply { Name = $"it is get request {param?.ToString() ?? string.Empty}" }
+                    ? new Reply { Name = $"it is get request {param?.ToString() ?? string.Empty} from {principal.Claims.First(c => c.Type == "name")} in {principal.Claims.First(c => c.Type == "scope")}" }
                     : reply?.GetReply();
 
             return result;

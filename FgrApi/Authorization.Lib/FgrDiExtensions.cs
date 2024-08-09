@@ -1,10 +1,12 @@
-﻿using Authorization.Lib.Handlers;
+﻿using Authorization.Lib.Filters;
+using Authorization.Lib.Handlers;
 using Authorization.Lib.Helpers;
 using Authorization.Lib.Interfaces;
 using Authorization.Lib.Interfaces.Options;
 using Authorization.SSO.Hosts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using OpenIddict.Validation.AspNetCore;
 using Refit;
 using static OpenIddict.Abstractions.OpenIddictConstants;
 
@@ -33,9 +35,12 @@ namespace Authorization.Lib
 
         public static void AddFgrApiServerConfig<TContext>(this IServiceCollection services, IFgrApiOptions? apiOptions) where TContext : DbContext
         {
-            if (apiOptions == null)  return;
+            if (apiOptions == null) return;
 
+            services?.AddSingleton(apiOptions);
             services?.AddSingleton<IFgrClientConfig>(apiOptions);
+            services?.AddScoped<RequestAddressFilter>();
+
             services?.AddAuthenticationServerInMemoryConfig<TContext>();
             services?.AddHostedService<AuthWorker<TContext>>();
 
@@ -43,15 +48,15 @@ namespace Authorization.Lib
             {
                 options.AddPolicy(FgrTermsHelper.AdminUIPolicy, policy =>
                 {
-                    //policy.AddAuthenticationSchemes(FgrTermsHelper.AdminUIAuthenticationScheme);
+                    policy.AddAuthenticationSchemes(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
                     policy.RequireAuthenticatedUser();
-                    policy.RequireClaim("scope", FgrTermsHelper.AdminUIScope);
+                    policy.RequireClaim(Claims.Scope, FgrTermsHelper.AdminUIScope);
                 });
                 options.AddPolicy(FgrTermsHelper.PaymentPolicy, policy =>
                 {
-                    //policy.AddAuthenticationSchemes(FgrTermsHelper.PaymentAuthenticationScheme);
+                    policy.AddAuthenticationSchemes(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
                     policy.RequireAuthenticatedUser();
-                    policy.RequireClaim("scope", FgrTermsHelper.PaymentScope);
+                    policy.RequireClaim(Claims.Scope, FgrTermsHelper.PaymentScope);
                     policy.RequireClaim(FgrTermsHelper.GetClientClaim(FgrTermsHelper.CompanyIdClaimType));
                     policy.RequireClaim(FgrTermsHelper.GetClientClaim(FgrTermsHelper.ProjectIdClaimType));
                     policy.RequireClaim(FgrTermsHelper.GetClientClaim(FgrTermsHelper.TypeClaimType));
@@ -98,6 +103,7 @@ namespace Authorization.Lib
                 })
                 .AddValidation(configuration =>
                 {
+                    configuration.UseAspNetCore();
                     configuration.UseLocalServer();
                 });
         }

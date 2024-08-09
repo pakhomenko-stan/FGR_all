@@ -1,6 +1,6 @@
+using Authorization.Core;
 using Authorization.Core.Infrastructure;
 using Authorization.Lib;
-using Authorization.Lib.Interfaces.Options;
 using FGR.Api.Options;
 using FGR.Application.Factories;
 using FGR.Application.Services;
@@ -25,6 +25,8 @@ namespace FGR.Api
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"));
 
+            //var connectString = "Data Source=localhost; Initial Catalog=AuthDb; Integrated Security=true; Connect Timeout=30; Encrypt=False; TrustServerCertificate=False; ApplicationIntent=ReadWrite; MultiSubnetFailover=False";
+            //builder.Services.AddAuthenticationServerDbConfig<AuthenticationDbContext>(connectString, 30);
             builder.Services.AddFgrApiServerConfig<AuthenticationDbContext>(s => s.GetRequiredService<IOptions<ApiOptions>>().Value);
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

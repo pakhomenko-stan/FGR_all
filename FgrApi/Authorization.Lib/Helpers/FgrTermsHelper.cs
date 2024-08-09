@@ -14,17 +14,11 @@
         public const string AdminUIScope = "AdminUIScope";
         public const string PaymentScope = "PaymentScope";
 
-        public const string AdminUIAuthenticationScheme = "AdminUIScheme";
         public const string AdminUIPolicy = "AdminUIPolicy";
-
-        public const string PaymentAuthenticationScheme = "PaymentScheme";
         public const string PaymentPolicy = "PaymentPolicy";
 
         public const string CompanyType = "Company";
         public const string ProjectType = "Project";
-
-        public const string WebClientId = "WebClientId";
-        public const string WebClientDisplayName = "WebClient";
 
         public const string ProjectIdClaimType = "projectIdClaim";
         public const string TypeClaimType = "typeClaim";

@@ -1,4 +1,5 @@
-﻿using CommonInterfaces.Services;
+﻿using System.Security.Claims;
+using CommonInterfaces.Services;
 using FGR.Common.Interfaces;
 
 namespace FGR.Application.Services.Abstract
@@ -9,12 +10,12 @@ namespace FGR.Application.Services.Abstract
     {
         protected IRepHolder RepHolder { get; } = repHolder;
 
-        public async Task<Reply?> ExecuteAsync(CancellationToken token) => await ExecuteGenericAsync<object>(default, null, token);
-        public async Task<Reply?> ExecuteAsync(Request? input, CancellationToken token) => await ExecuteGenericAsync<object>(default, input, token);
-        public async Task<Reply?> ExecuteAsync<TPar>(TPar param, Request? input, CancellationToken token) => await ExecuteGenericAsync(param, input, token);
-        public async Task<Reply?> ExecuteAsync<TPar>(TPar param, CancellationToken token) => await ExecuteGenericAsync(param, null, token);
+        public async Task<Reply?> ExecuteAsync(ClaimsPrincipal principal, CancellationToken token) => await ExecuteGenericAsync<object>(default, null, principal, token);
+        public async Task<Reply?> ExecuteAsync(Request? input, ClaimsPrincipal principal, CancellationToken token) => await ExecuteGenericAsync<object>(default, input, principal, token);
+        public async Task<Reply?> ExecuteAsync<TPar>(TPar param, Request? input, ClaimsPrincipal principal, CancellationToken token) => await ExecuteGenericAsync(param, input, principal, token);
+        public async Task<Reply?> ExecuteAsync<TPar>(TPar param, ClaimsPrincipal principal, CancellationToken token) => await ExecuteGenericAsync(param, null, principal, token);
 
-        protected abstract Task<Reply?> ExecuteGenericAsync<TPar>(TPar? param, Request? input, CancellationToken token);
+        protected abstract Task<Reply?> ExecuteGenericAsync<TPar>(TPar? param, Request? input, ClaimsPrincipal principal, CancellationToken token);
 
     }
 }

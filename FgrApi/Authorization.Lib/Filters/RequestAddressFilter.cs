@@ -25,10 +25,9 @@ namespace Authorization.Lib.Filters
 
         private bool IsAllowed(ActionExecutingContext context)
         {
-            var islocal = ipList?.Contains(context?.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? string.Empty) ?? true;
-            var claimId = context?.HttpContext?.User?.Claims?.FirstOrDefault(c => c.Type == FgrTermsHelper.idClaim);
-            var isServer = claimId?.Value == options.ClientId;
-            return islocal && isServer;
+            var ip = context?.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? string.Empty;
+            var islocal = ipList?.Contains(ip) ?? true;
+            return islocal;
         }
 
         private static void SetResponseOfForbidden(ActionExecutingContext context)

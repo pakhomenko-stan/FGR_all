@@ -6,7 +6,7 @@ using Microsoft.Extensions.Options;
 
 namespace FGR.Infrastructure
 {
-    public static class FgrDiExtensions
+    public static partial class FgrDiExtensions
     {
         public static void AddFrgRepositories(this IServiceCollection services)
         {

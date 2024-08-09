@@ -5,8 +5,8 @@ namespace Authorization.Lib.Interfaces.Options
     public interface IFgrApiOptions : IFgrClientConfig
     {
         bool UseDevelopmentCertificates { get; set; }
-        X509Certificate2 EncriptionSertificateThumbprint { get; set; }
-        X509Certificate2 SigningSertificateThumbprint { get; set; }
+        string EncriptionSertificateThumbprint { get; set; }
+        string SigningSertificateThumbprint { get; set; }
         bool EnableHttps { get; set; }
         public IEnumerable<string> AllowedIPAddresses { get; set; }
 

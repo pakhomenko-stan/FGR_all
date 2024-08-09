@@ -1,17 +1,16 @@
 ﻿using Authorization.Lib.Handlers;
 using Authorization.Lib.Helpers;
 using Authorization.Lib.Interfaces;
+using Authorization.Lib.Interfaces.Options;
+using Authorization.SSO.Hosts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Refit;
-using Authorization.Core;
-using Authorization.Lib.Interfaces.Options;
-using CommonInterfaces.Options;
 using static OpenIddict.Abstractions.OpenIddictConstants;
 
 namespace Authorization.Lib
 {
-    public static class FgrDiExtensions
+    public static partial class FgrDiExtensions
     {
         public static void AddFgrAdminClient(this IServiceCollection services, IFgrClientConfig apiConfig)
         {
@@ -26,21 +25,31 @@ namespace Authorization.Lib
             .AddHttpMessageHandler<RequestAdminHandler>();
         }
 
-        public static void AddFgrApiServerConfig<TContext>(this IServiceCollection services, IConnectStringOptions authConnect, IFgrApiOptions apiOptions) where TContext : DbContext
+        public static void AddFgrApiServerConfig<TContext>(this IServiceCollection services, Func<IServiceProvider, IFgrApiOptions> apiOptionsFactory) where TContext : DbContext
         {
-            services.AddAuthenticationServerDbConfig<TContext>(authConnect.ConnectString, authConnect.CommandTimeout);
+            var apiOptions = apiOptionsFactory?.Invoke(services.BuildServiceProvider());
+            services.AddFgrApiServerConfig<TContext>(apiOptions);
+        }
 
-            services.AddAuthorization(options =>
+        public static void AddFgrApiServerConfig<TContext>(this IServiceCollection services, IFgrApiOptions? apiOptions) where TContext : DbContext
+        {
+            if (apiOptions == null)  return;
+
+            services?.AddSingleton<IFgrClientConfig>(apiOptions);
+            services?.AddAuthenticationServerInMemoryConfig<TContext>();
+            services?.AddHostedService<AuthWorker<TContext>>();
+
+            services?.AddAuthorization(options =>
             {
                 options.AddPolicy(FgrTermsHelper.AdminUIPolicy, policy =>
                 {
-                    policy.AddAuthenticationSchemes(FgrTermsHelper.AdminUIAuthenticationScheme);
+                    //policy.AddAuthenticationSchemes(FgrTermsHelper.AdminUIAuthenticationScheme);
                     policy.RequireAuthenticatedUser();
                     policy.RequireClaim("scope", FgrTermsHelper.AdminUIScope);
                 });
                 options.AddPolicy(FgrTermsHelper.PaymentPolicy, policy =>
                 {
-                    policy.AddAuthenticationSchemes(FgrTermsHelper.PaymentAuthenticationScheme);
+                    //policy.AddAuthenticationSchemes(FgrTermsHelper.PaymentAuthenticationScheme);
                     policy.RequireAuthenticatedUser();
                     policy.RequireClaim("scope", FgrTermsHelper.PaymentScope);
                     policy.RequireClaim(FgrTermsHelper.GetClientClaim(FgrTermsHelper.CompanyIdClaimType));
@@ -52,7 +61,7 @@ namespace Authorization.Lib
                 });
             });
 
-            services.AddOpenIddict()
+            services?.AddOpenIddict()
                 .AddCore(configuration =>
                 {
                     configuration.UseEntityFrameworkCore()

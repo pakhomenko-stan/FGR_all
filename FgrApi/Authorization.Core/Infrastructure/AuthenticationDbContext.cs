@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Authorization.Core.Infrastructure
 {
-    public partial class AuthenticationDbContext(DbContextOptions options) : IdentityDbContext<User>(options)
+    public partial class AuthenticationDbContext(DbContextOptions<AuthenticationDbContext> options) : IdentityDbContext<User>(options)
     {
     }
 }

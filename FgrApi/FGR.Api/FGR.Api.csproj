@@ -17,10 +17,12 @@
     </PackageReference>
     <PackageReference Include="Microsoft.Identity.Web" Version="3.0.1" />
     <PackageReference Include="Microsoft.Identity.Web.DownstreamApi" Version="3.0.1" />
+    <PackageReference Include="OpenIddict.AspNetCore" Version="5.7.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.7.0" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Authorization.Core\Authorization.Core.csproj" />
     <ProjectReference Include="..\Authorization.Lib\Authorization.Lib.csproj" />
     <ProjectReference Include="..\CommonInterfaces\CommonInterfaces.csproj" />
     <ProjectReference Include="..\FGR.Application\FGR.Application.csproj" />

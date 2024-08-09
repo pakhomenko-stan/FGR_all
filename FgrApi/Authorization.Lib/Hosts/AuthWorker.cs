@@ -1,19 +1,19 @@
-﻿using Authorization.Core.Infrastructure;
-using Authorization.Lib.Handlers;
+﻿using Authorization.Lib.Handlers;
 using Authorization.Lib.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using OpenIddict.Abstractions;
 
 namespace Authorization.SSO.Hosts
 {
-    internal class AuthWorker(IServiceProvider serviceProvider) : IHostedService
+    public class AuthWorker<TContext>(IServiceProvider serviceProvider) : IHostedService where TContext : DbContext
     {
         public async Task StartAsync(CancellationToken cancellationToken)
         {
             using var scope = serviceProvider.CreateScope();
 
-            var context = scope.ServiceProvider.GetRequiredService<AuthenticationDbContext>();
+            var context = scope.ServiceProvider.GetRequiredService<TContext>();
             await context.Database.EnsureCreatedAsync(cancellationToken);
             await RegisterClientsAsync(scope.ServiceProvider, cancellationToken);
         }

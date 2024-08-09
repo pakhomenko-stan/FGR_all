@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using CommonInterfaces.DTO;
 using FGR.Application.Services;
+using Authorization.Lib.Helpers;
 
 namespace FGR.Api.Controllers
 {
-    //[Authorize]
+    [Authorize(Policy = FgrTermsHelper.AdminUIPolicy)]
     [Route("api/admin")]
     public class AdminController : BaseFgrController
     {

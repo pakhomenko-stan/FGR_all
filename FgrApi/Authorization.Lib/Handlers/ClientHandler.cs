@@ -32,7 +32,6 @@ public static class ClientHandler
                 Permissions.Scopes.Roles,
                 Permissions.Scopes.Email,
                 Permissions.Prefixes.Scope + Scopes.OfflineAccess,
-                Permissions.Prefixes.GrantType + "sign_in_as"
             },
             Requirements =
             {

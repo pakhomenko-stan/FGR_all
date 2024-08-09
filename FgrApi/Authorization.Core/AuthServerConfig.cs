@@ -4,7 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Authorization.Core;
 
-public static class AuthServerConfig
+public static partial class AuthServerConfig
 {
     public static void AddAuthenticationServerDbConfig<TContext>(this IServiceCollection services, string connectString, int? timeOut) where TContext : DbContext
     {

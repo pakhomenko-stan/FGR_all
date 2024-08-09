@@ -9,7 +9,7 @@ namespace Authorization.Lib.Filters
     /// <summary>
     /// Request to this controller may be originated only from allowed IP addresses (ServerOptions.AllowedIPAddresses) 
     /// </summary>
-    internal class RequestAddressFilter(IFgrApiOptions options) : ActionFilterAttribute
+    public class RequestAddressFilter(IFgrApiOptions options) : ActionFilterAttribute
     {
         private readonly List<string> ipList = options?.AllowedIPAddresses?.ToList() ?? [];
 
